@@ -17,11 +17,17 @@ public class ProcessMesh : MonoBehaviour
             AddVertToMap(vert);
         }
 
+        GenerateVoxel();
     }
 
     private void SetupMap()
     {
         ///Generate map according to mesh boundaries and Voxel resolution
+    }
+
+    private void GenerateVoxel()
+    {
+        ///Generate VoxelMesh according to map content
     }
 
     private void AddVertToMap(Vector3 vert)
