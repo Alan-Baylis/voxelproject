@@ -19,7 +19,21 @@ public class VoxelUnit
 
     private void ProcessColors()
     {
+        float r=0.0f, g=0.0f, b=0.0f, a = 0.0f;
+        int count = colors.Count;
+        foreach(Color col in colors)
+        {
+            r += col.r;
+            g += col.g;
+            b += col.b;
+            a += col.a;
+        }
+        r /= count;
+        g /= count;
+        b /= count;
+        a /= count;
 
+        color = new Color(r, g, b, a);
     }
 }
 
