@@ -37,6 +37,7 @@ public class VoxelUnit
     }
 }
 
+[System.Serializable]
 public struct Coord
 {
     public int x;
@@ -49,4 +50,40 @@ public struct Coord
         this.y = y;
         this.z = z;
     }
+
+    public static Coord Substract(Coord a, Coord b)
+    {
+        return new Coord(a.x - b.x, a.y - b.y, a.z - b.z);
+    }
+    
+    public Vector3 Vect()
+    {
+        return new Vector3(x, y, z);
+    }
+
+    public string Print()
+    {
+        return x.ToString() + ' ' + y.ToString() + ' ' + z.ToString();
+    }
+    
+}
+
+public struct Triangle
+{
+    public Coord a;
+    public Coord b;
+    public Coord c;
+
+    public Triangle (Coord a, Coord b, Coord c)
+    {
+        this.a = a;
+        this.b = b;
+        this.c = c;
+    }
+
+    public Coord[] Array()
+    {
+        return new Coord[3] {a, b, c};
+    }
+    
 }
