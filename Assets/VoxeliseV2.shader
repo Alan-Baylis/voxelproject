@@ -1,4 +1,4 @@
-﻿Shader "Unlit/Voxelise"
+﻿Shader "Unlit/VoxeliseV2"
 {
 	Properties
 	{
@@ -10,18 +10,13 @@
 	{
 		Tags { "RenderType"="Opaque" }
 
-		
-
 		Pass
 		{
 			CGPROGRAM
-
-			
 			#pragma vertex vert
 			#pragma fragment frag
 			
 			#include "UnityCG.cginc"
-			#include "UnityLightingCommon.cginc"
 
 			float4 allMyVertex[1] = {float4(0,0,0,0)};
 			float4 allMyVertex2[1] = {float4(0,0,0,0)};
@@ -32,14 +27,12 @@
 			{
 				float4 vertex : POSITION;
 				float2 uv : TEXCOORD0;
-				float3 normal : NORMAL;
 			};
 
 			struct v2f
 			{
 				float2 uv : TEXCOORD0;
 				float4 vertex : SV_POSITION;
-				float4 diff : COLOR0;
 			};
 
 			sampler2D _MainTex;
@@ -49,14 +42,6 @@
 			{
 				v2f o;
 				o.vertex = UnityObjectToClipPos(v.vertex);
-
-				float3 worldNormal = UnityObjectToWorldNormal(v.normal);
-
-				float nl = max(0, dot(-worldNormal, _WorldSpaceLightPos0.xyz));
-                o.diff = nl * _LightColor0;
-				o.diff.rgb += ShadeSH9(half4(worldNormal,1));
-
-
 				o.vertex.x = round(o.vertex.x);
 				o.vertex.y = round(o.vertex.y);
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
@@ -85,10 +70,8 @@
 			
 			fixed4 frag (v2f i) : COLOR
 			{
-
-				
 				fixed4 col = tex2D(_MainTex, i.uv);
-				return col*=(i.diff);
+				return col;
 			}
 
 
