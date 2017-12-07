@@ -50,11 +50,7 @@
 				v2f o;
 				o.vertex = UnityObjectToClipPos(v.vertex);
 
-				float3 worldNormal = UnityObjectToWorldNormal(v.normal);
-
-				float nl = max(0, dot(-worldNormal, _WorldSpaceLightPos0.xyz));
-                o.diff = nl * _LightColor0;
-				o.diff.rgb += ShadeSH9(half4(worldNormal,1));
+				
 
 
 				o.vertex.x = round(o.vertex.x);
@@ -78,6 +74,12 @@
 					}
 
 				}
+
+				float3 worldNormal = UnityObjectToWorldNormal(v.normal);
+
+				float nl = max(0, dot(-worldNormal, _WorldSpaceLightPos0.xyz));
+                o.diff = nl * _LightColor0;
+				o.diff.rgb += ShadeSH9(half4(worldNormal,1));
 			
 				
 				return o;
@@ -88,6 +90,7 @@
 
 				
 				fixed4 col = tex2D(_MainTex, i.uv);
+				//col = float4(0.8,0.2,0.2,1);
 				return col*=(i.diff);
 			}
 
