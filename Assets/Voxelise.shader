@@ -2,15 +2,17 @@
 {
 	Properties
 	{
+
+		//object Texture
 		_MainTex ("Texture", 2D) = "white" {}
+
+		//Size of the cubes
 		_DefinitionSize("Definition", float) = 1
 
 	}
 	SubShader
 	{
 		Tags { "RenderType"="Opaque" }
-
-		
 
 		Pass
 		{
@@ -21,12 +23,14 @@
 			#pragma fragment frag
 			
 			#include "UnityCG.cginc"
-			#include "UnityLightingCommon.cginc"
+			#include "UnityLightingCommon.cginc" //needed for shadows
 
+
+			// array for knowing position of all the vertices
 			float4 allMyVertex[1] = {float4(0,0,0,0)};
 			float4 allMyVertex2[1] = {float4(0,0,0,0)};
-
 			float arraySize = 1;
+
 
 			struct appdata
 			{
@@ -44,19 +48,24 @@
 
 			sampler2D _MainTex;
 			float4 _MainTex_ST;
+
+
+
 			
 			v2f vert (appdata v)
 			{
 				v2f o;
-				o.vertex = UnityObjectToClipPos(v.vertex);
+				o.vertex = UnityObjectToClipPos(v.vertex); //convert to camera space
 				
-
-				
-
-
+				//displace the position of the vertices in the camera space
 				o.vertex.x = round(o.vertex.x);
 				o.vertex.y = round(o.vertex.y);
+
+
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+
+
+				//////////////////////////////////////////////////////////
 				if(allMyVertex[0].x == 0 && allMyVertex[0].w == 0){
 					allMyVertex[0] = o.vertex;
 				}else{
@@ -76,10 +85,13 @@
 
 				}
 
+				//////////////////////////////////////////////////////////
+
 				float3 worldNormal = UnityObjectToWorldNormal(v.normal);
 
+				// light received by the object
 				float nl = max(0, dot(-worldNormal, _WorldSpaceLightPos0.xyz));
-                o.diff = nl * _LightColor0;
+                o.diff = nl * _LightColor0; //color of the light
 				o.diff.rgb += ShadeSH9(half4(worldNormal,1));
 			
 				
@@ -90,9 +102,9 @@
 			{
 
 				
-				fixed4 col = tex2D(_MainTex, i.uv);
-				//col = float4(0.8,0.2,0.2,1);
-				return col*=(i.diff);
+				fixed4 col = tex2D(_MainTex, i.uv); //color of the texture
+				//col = float4(0.8,0.2,0.2,1); //redColor
+				return col*=(i.diff); // color per the light received by the object
 			}
 
 
