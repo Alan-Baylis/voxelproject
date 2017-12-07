@@ -5,6 +5,7 @@ using UnityEngine;
 public class ProcessMesh : MonoBehaviour
 {
     public Mesh meshToCompute;
+    public GameObject voxelPrefab;
 
     [Header("Voxellization Parameters")]
     [Range(1.0f, 30.0f)]
@@ -35,7 +36,8 @@ public class ProcessMesh : MonoBehaviour
         }
         */
         ConnectPoints();
-        //FillTriangles();
+        FillTriangles();
+        FillMap();
         GenerateVoxel();
     }
 
@@ -109,29 +111,29 @@ public class ProcessMesh : MonoBehaviour
         {
             if (IsInMapRange(c))
             {
-                if (c.x < minX)
+                if (c.x <= minX)
                 {
                     minX = c.x;
                 }
-                if (c.x > maxX)
+                if (c.x >= maxX)
                 {
                     maxX = c.x;
                 }
 
-                if (c.y < minY)
+                if (c.y <= minY)
                 {
                     minY = c.y;
                 }
-                if (c.y > maxY)
+                if (c.y >= maxY)
                 {
                     maxY = c.y;
                 }
 
-                if (c.z < minZ)
+                if (c.z <= minZ)
                 {
                     minZ = c.z;
                 }
-                if (c.z > maxZ)
+                if (c.z >= maxZ)
                 {
                     maxZ = c.z;
                 }
@@ -141,23 +143,19 @@ public class ProcessMesh : MonoBehaviour
                 Debug.Log("Ya");
             }
         }
-        Debug.Log(xSize);
-        Debug.Log(ySize);
-        Debug.Log(zSize);
 
         for (int x = minX; x < maxX; ++x)
         {
             for (int y = minY; y < maxY; ++y)
             {
-                for (int z = minZ; x < maxZ; ++z)
+                for (int z = minZ; z < maxZ; ++z)
                 {
-                    Debug.Log(x.ToString() + ' ' + y.ToString() + ' ' + z.ToString());
                     if (map[x, y, z].empty)
                     {
-                        Debug.Log("yo");
                         Coord m = new Coord(x, y, z);
                         if (IsInsideTriangle(m, tri))
                         {
+                            Debug.Log("go");
                             map[x, y, z].AddColor(Color.white);
                         }
                     }
@@ -179,7 +177,7 @@ public class ProcessMesh : MonoBehaviour
                 {
                     if (map[x, y, z].empty == false)
                     {
-                        Instantiate(GameObject.CreatePrimitive(PrimitiveType.Cube), new Vector3(x, y, z) - meshToCompute.bounds.extents, Quaternion.identity, transform);
+                        Instantiate(voxelPrefab, new Vector3(x, y, z) - meshToCompute.bounds.extents, Quaternion.identity, transform);
                     }
                 }
             }
@@ -266,10 +264,63 @@ public class ProcessMesh : MonoBehaviour
         if (Vector3.Dot(Vector3.Cross(ab, am), Vector3.Cross(am, ac)) >= 0.0f) check++;
         if (Vector3.Dot(Vector3.Cross(ba, bm), Vector3.Cross(bm, bc)) >= 0.0f) check++;
         if (Vector3.Dot(Vector3.Cross(ca, cm), Vector3.Cross(cm, cb)) >= 0.0f) check++;
+        Debug.Log(check);
         if (check == 3)
             return true;
         else
             return false;
+    }
+
+    private void FillMap()
+    {
+        VoxelUnit[,,] tempMap = map; 
+        List<Coord> coordsToPrint = new List<Coord>();
+        for (int x = 0; x < xSize; ++x)
+        {
+            for (int y = 0; y < ySize; ++y)
+            {
+                for (int z = 0; z < zSize; ++z)
+                {
+                    if (map[x,y,z].empty)
+                    {
+                        Coord c = new Coord(x, y, z);
+                        if (GetBoundaries(c) >= 5)
+                        {
+                            coordsToPrint.Add(c);
+                        }
+                    }                  
+                }
+            }
+        }
+        foreach(Coord c in coordsToPrint)
+        {
+            map[c.x, c.y, c.z].AddColor(Color.white);
+        }
+    }
+
+    private int GetBoundaries(Coord c)
+    {
+        int result = 0;
+        int debug = 0;
+        for (int x = c.x - 1; x <= c.x + 1; ++x)
+        {
+            for (int y = c.y - 1; y <= c.y + 1; ++y)
+            {
+                for (int z = c.z - 1; z <= c.z + 1; ++z)
+                {
+                    if (IsInMapRange(new Coord(x, y, z)))
+                    {
+                        if (map[x, y, z].empty == false)
+                        {
+                            result++;
+                        }
+                    }
+                    debug++;
+                }
+            }
+        }
+        Debug.Log(debug);
+        return result;
     }
 
     private Coord ClampIntoBounds(Coord c)
