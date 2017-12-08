@@ -8,7 +8,7 @@ public class ProcessMesh : MonoBehaviour
     public GameObject voxelPrefab;
 
     [Header("Voxellization Parameters")]
-    [Range(1.0f, 30.0f)]
+    [Range(1.0f, 100.0f)]
     public float definition = 2.0f;
 
     private VoxelUnit[,,] map;
@@ -37,7 +37,8 @@ public class ProcessMesh : MonoBehaviour
         ConnectPoints();
         FillTriangles();
         FillMap();
-        GenerateVoxel();
+        // GenerateVoxel();
+        GetComponent<GenerateVoxelMesh>().GenerateMesh(map, new Coord(xSize, ySize, zSize));
     }
 
     ///Generate map according to mesh boundaries and Voxel resolution
@@ -139,7 +140,7 @@ public class ProcessMesh : MonoBehaviour
             }
             else
             {
-                Debug.Log("Ya");
+                // Debug.Log("Ya");
             }
         }
 
@@ -154,7 +155,7 @@ public class ProcessMesh : MonoBehaviour
                         Coord m = new Coord(x, y, z);
                         if (IsInsideTriangle(m, tri))
                         {
-                            Debug.Log("go");
+                            // Debug.Log("go");
                             map[x, y, z].AddColor(Color.white);
                         }
                     }
@@ -272,7 +273,6 @@ public class ProcessMesh : MonoBehaviour
 
     private void FillMap()
     {
-        VoxelUnit[,,] tempMap = map; 
         List<Coord> coordsToPrint = new List<Coord>();
         for (int x = 0; x < xSize; ++x)
         {
@@ -314,11 +314,10 @@ public class ProcessMesh : MonoBehaviour
                             result++;
                         }
                     }
-                    debug++;
                 }
             }
         }
-        Debug.Log(debug);
+        // Debug.Log(debug);
         return result;
     }
 

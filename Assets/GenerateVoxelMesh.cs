@@ -20,13 +20,61 @@ public class GenerateVoxelMesh : MonoBehaviour
     void Start()
     {
         mesh = GetComponent<MeshFilter>().mesh;
-        CubeTop(0, 0, 0);
-        CubeNorth(0, 0, 0);
-        CubeSouth(0, 0, 0);
-        CubeEast(0, 0, 0);
-        CubeWest(0, 0, 0);
-        CubeBot(0, 0, 0);
+       
+        // CubeTop(0, 0, 0);
+        // CubeNorth(0, 0, 0);
+        // CubeSouth(0, 0, 0);
+        // CubeEast(0, 0, 0);
+        // CubeWest(0, 0, 0);
+        // CubeBot(0, 0, 0);
+        // UpdateMesh();
+    }
+
+    public void GenerateMesh(VoxelUnit[,,] map, Coord bounds)
+    {
+        for (int x = 0; x < bounds.x; ++x)
+        {
+            for (int y = 0; y < bounds.y; ++y)
+            {
+                for (int z = 0; z < bounds.z; ++z)
+                {
+                    if (map[x,y,z].empty == false)
+                    {
+                        if (!IsInMapRange(x,y+1,z, bounds) || map[x,y+1,z].empty)
+                        {
+                            CubeTop(x, y, z);
+                        }
+                        if (!IsInMapRange(x,y-1,z, bounds) || map[x, y-1 ,z].empty)
+                        {
+                            CubeBot(x, y, z);
+                        }
+                        if (!IsInMapRange(x+1,y,z, bounds) || map[x+1,y,z].empty)
+                        {
+                            CubeEast(x, y, z);
+                        }
+                        if (!IsInMapRange(x-1,y,z, bounds) || map[x-1,y,z].empty)
+                        {
+                            CubeWest(x, y, z);
+                        }
+                        if (!IsInMapRange(x,y,z+1, bounds) || map[x,y,z+1].empty)
+                        {
+                            CubeNorth(x, y, z);
+                        }
+                        if (!IsInMapRange(x,y,z-1, bounds) || map[x,y,z-1].empty)
+                        {
+                            CubeSouth(x, y, z);
+                        }
+                    }
+                }
+            }
+        }
         UpdateMesh();
+
+    }
+
+    private bool IsInMapRange(int x, int y, int z, Coord bounds)
+    {
+        return x >= 0 && x < bounds.x && y >= 0 && y < bounds.y && z >= 0 && z < bounds.z;
     }
 
     private void UpdateMesh()
@@ -65,7 +113,6 @@ public class GenerateVoxelMesh : MonoBehaviour
 
     private void CubeTop(int x, int y, int z)
     {
-
         newVertices.Add(new Vector3(x, y, z + 1));
         newVertices.Add(new Vector3(x + 1, y, z + 1));
         newVertices.Add(new Vector3(x + 1, y, z));
@@ -80,7 +127,6 @@ public class GenerateVoxelMesh : MonoBehaviour
 
     private void CubeNorth(int x, int y, int z)
     {
-
         newVertices.Add(new Vector3(x + 1, y - 1, z + 1));
         newVertices.Add(new Vector3(x + 1, y, z + 1));
         newVertices.Add(new Vector3(x, y, z + 1));
