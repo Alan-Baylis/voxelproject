@@ -12,7 +12,7 @@
 	}
 	SubShader
 	{
-		Tags { "RenderType"="Opaque" }
+		 Tags {"LightMode"="ForwardBase"}
 
 		Pass
 		{
@@ -23,7 +23,10 @@
 			#pragma fragment frag
 			
 			#include "UnityCG.cginc"
-			#include "UnityLightingCommon.cginc" //needed for shadows
+			#include "Lighting.cginc"
+
+			 #pragma multi_compile_fwdbase nolightmap nodirlightmap nodynlightmap novertexlight
+            #include "AutoLight.cginc"
 
 
 			// array for knowing position of all the vertices
@@ -42,8 +45,10 @@
 			struct v2f
 			{
 				float2 uv : TEXCOORD0;
-				float4 vertex : SV_POSITION;
-				float4 diff : COLOR0;
+				 SHADOW_COORDS(1)
+				float4 pos : SV_POSITION;
+				float3 diff : COLOR0;
+				fixed3 ambient : COLOR1;
 			};
 
 			sampler2D _MainTex;
@@ -55,11 +60,11 @@
 			v2f vert (appdata v)
 			{
 				v2f o;
-				o.vertex = UnityObjectToClipPos(v.vertex); //convert to camera space
+				o.pos = UnityObjectToClipPos(v.vertex); //convert to camera space
 				
 				//displace the position of the vertices in the camera space
-				o.vertex.x = round(o.vertex.x);
-				o.vertex.y = round(o.vertex.y);
+				o.pos.x = round(o.pos.x);
+				o.pos.y = round(o.pos.y);
 
 
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
@@ -67,7 +72,7 @@
 
 				//////////////////////////////////////////////////////////
 				if(allMyVertex[0].x == 0 && allMyVertex[0].w == 0){
-					allMyVertex[0] = o.vertex;
+					allMyVertex[0] = o.pos;
 				}else{
 					allMyVertex2 = allMyVertex;
 					arraySize ++;
@@ -76,7 +81,7 @@
 					for(int i = 0; i < arraySize; i++){
 
 						if(arraySize-1 == i){
-							allMyVertex[i] = o.vertex;
+							allMyVertex[i] = o.pos;
 						}else{
 							allMyVertex[i] = allMyVertex2[i];
 						}
@@ -89,10 +94,10 @@
 
 				float3 worldNormal = UnityObjectToWorldNormal(v.normal);
 
-				// light received by the object
-				float nl = max(0, dot(-worldNormal, _WorldSpaceLightPos0.xyz));
-                o.diff = nl * _LightColor0; //color of the light
-				o.diff.rgb += ShadeSH9(half4(worldNormal,1));
+                float nl = max(0, dot(worldNormal, _WorldSpaceLightPos0.xyz));
+                o.diff = nl * _LightColor0.rgb;
+                o.ambient = ShadeSH9(half4(worldNormal,1));
+                TRANSFER_SHADOW(o)
 			
 				
 				return o;
@@ -103,8 +108,12 @@
 
 				
 				fixed4 col = tex2D(_MainTex, i.uv); //color of the texture
-				//col = float4(0.8,0.2,0.2,1); //redColor
-				return col*=(i.diff); // color per the light received by the object
+				//col = float4(0.8,0.3,0.3,1); //redColor
+
+                fixed shadow = SHADOW_ATTENUATION(i);
+                fixed3 lighting = i.diff * shadow + i.ambient;
+                col.rgb *= lighting;
+				return col; 
 			}
 
 
@@ -113,5 +122,8 @@
 			
 			ENDCG
 		}
+
+		UsePass "Legacy Shaders/VertexLit/SHADOWCASTER"
+
 	}
 }
