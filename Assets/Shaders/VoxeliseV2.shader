@@ -1,4 +1,5 @@
-﻿Shader "Unlit/VoxeliseV2"{
+﻿Shader "Unlit/VoxeliseV2"
+{
 	Properties
 	{
 
@@ -62,9 +63,8 @@
 				o.pos = UnityObjectToClipPos(v.vertex); //convert to camera space
 				
 				//displace the position of the vertices in the camera space
+				o.pos.x = round(o.pos.x);
 				o.pos.y = round(o.pos.y);
-								o.pos.x = round(o.pos.x);
-
 
 
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
