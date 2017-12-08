@@ -9,25 +9,15 @@ public class GenerateVoxelMesh : MonoBehaviour
     private List<Vector2> newUV = new List<Vector2>();
 
     private float tUnit = 0.25f;
-    private Vector2 tStone = new Vector2(1, 0);
-    private Vector2 tGrass = new Vector2(0, 1);
+    private Vector2 baseUV = new Vector2(1, 0);
 
     private Mesh mesh;
-    private MeshCollider col;
 
     private int faceCount = 0;
 
-    void Start()
+    void Awake()
     {
         mesh = GetComponent<MeshFilter>().mesh;
-       
-        // CubeTop(0, 0, 0);
-        // CubeNorth(0, 0, 0);
-        // CubeSouth(0, 0, 0);
-        // CubeEast(0, 0, 0);
-        // CubeWest(0, 0, 0);
-        // CubeBot(0, 0, 0);
-        // UpdateMesh();
     }
 
     public void GenerateMesh(VoxelUnit[,,] map, Coord bounds)
@@ -89,10 +79,10 @@ public class GenerateVoxelMesh : MonoBehaviour
         newUV.Clear();
         newTriangles.Clear();
 
-        faceCount = 0; //Fixed: Added this thanks to a bug pointed out by ratnushock!
+        faceCount = 0;
     }
 
-    void Cube(Vector2 texturePos)
+    private void CompleteGeometry()
     {
         newTriangles.Add(faceCount * 4); //1
         newTriangles.Add(faceCount * 4 + 1); //2
@@ -101,12 +91,12 @@ public class GenerateVoxelMesh : MonoBehaviour
         newTriangles.Add(faceCount * 4 + 2); //3
         newTriangles.Add(faceCount * 4 + 3); //4
 
-        newUV.Add(new Vector2(tUnit * texturePos.x + tUnit, tUnit * texturePos.y));
-        newUV.Add(new Vector2(tUnit * texturePos.x + tUnit, tUnit * texturePos.y + tUnit));
-        newUV.Add(new Vector2(tUnit * texturePos.x, tUnit * texturePos.y + tUnit));
-        newUV.Add(new Vector2(tUnit * texturePos.x, tUnit * texturePos.y));
+        newUV.Add(new Vector2(tUnit * baseUV.x + tUnit, tUnit * baseUV.y));
+        newUV.Add(new Vector2(tUnit * baseUV.x + tUnit, tUnit * baseUV.y + tUnit));
+        newUV.Add(new Vector2(tUnit * baseUV.x, tUnit * baseUV.y + tUnit));
+        newUV.Add(new Vector2(tUnit * baseUV.x, tUnit * baseUV.y));
 
-        faceCount++; // Add this line
+        faceCount++; 
     }
 
     #region Mesh ultra boring maths
@@ -118,11 +108,7 @@ public class GenerateVoxelMesh : MonoBehaviour
         newVertices.Add(new Vector3(x + 1, y, z));
         newVertices.Add(new Vector3(x, y, z));
 
-        Vector2 texturePos;
-
-        texturePos = tStone;
-
-        Cube(texturePos);
+        CompleteGeometry();
     }
 
     private void CubeNorth(int x, int y, int z)
@@ -132,11 +118,7 @@ public class GenerateVoxelMesh : MonoBehaviour
         newVertices.Add(new Vector3(x, y, z + 1));
         newVertices.Add(new Vector3(x, y - 1, z + 1));
 
-        Vector2 texturePos;
-
-        texturePos = tStone;
-
-        Cube(texturePos);
+        CompleteGeometry();
     }
 
     private void CubeEast(int x, int y, int z)
@@ -147,11 +129,7 @@ public class GenerateVoxelMesh : MonoBehaviour
         newVertices.Add(new Vector3(x + 1, y, z + 1));
         newVertices.Add(new Vector3(x + 1, y - 1, z + 1));
 
-        Vector2 texturePos;
-
-        texturePos = tStone;
-
-        Cube(texturePos);
+        CompleteGeometry();
     }
 
     private void CubeSouth(int x, int y, int z)
@@ -162,11 +140,7 @@ public class GenerateVoxelMesh : MonoBehaviour
         newVertices.Add(new Vector3(x + 1, y, z));
         newVertices.Add(new Vector3(x + 1, y - 1, z));
 
-        Vector2 texturePos;
-
-        texturePos = tStone;
-
-        Cube(texturePos);
+        CompleteGeometry();
     }
 
     private void CubeWest(int x, int y, int z)
@@ -177,11 +151,7 @@ public class GenerateVoxelMesh : MonoBehaviour
         newVertices.Add(new Vector3(x, y, z));
         newVertices.Add(new Vector3(x, y - 1, z));
 
-        Vector2 texturePos;
-
-        texturePos = tStone;
-
-        Cube(texturePos);
+        CompleteGeometry();
     }
 
     private void CubeBot(int x, int y, int z)
@@ -192,14 +162,8 @@ public class GenerateVoxelMesh : MonoBehaviour
         newVertices.Add(new Vector3(x + 1, y - 1, z + 1));
         newVertices.Add(new Vector3(x, y - 1, z + 1));
 
-        Vector2 texturePos;
-
-        texturePos = tStone;
-
-        Cube(texturePos);
+        CompleteGeometry();
     }
 
     #endregion
-
-
 }

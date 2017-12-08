@@ -5,11 +5,12 @@ using UnityEngine;
 public class VoxelUnit
 {
 	public bool empty = true;
-    public Color color = Color.white;
+    public Color color = Color.white; //Unused. Supposed to allow color use.
 
     private List<Color> colors = new List<Color>();
 
-    public void AddColor(Color col)
+    ///Activate a VoxelUnit and (unused) adding colors to it.
+    public void AddColor(Color col) 
     {
         if (empty)
             empty = false;
@@ -37,7 +38,7 @@ public class VoxelUnit
     }
 }
 
-[System.Serializable]
+
 public struct Coord
 {
     public int x;
@@ -61,9 +62,10 @@ public struct Coord
         return new Vector3(x, y, z);
     }
 
-    public string Print()
+    ///Use for debug.
+    public string Print() 
     {
-        return x.ToString() + ' ' + y.ToString() + ' ' + z.ToString();
+        return "Coord : " + x.ToString() + ' ' + y.ToString() + ' ' + z.ToString();
     }
     
 }

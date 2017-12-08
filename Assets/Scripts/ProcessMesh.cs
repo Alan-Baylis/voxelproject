@@ -5,7 +5,7 @@ using UnityEngine;
 public class ProcessMesh : MonoBehaviour
 {
     public Mesh meshToCompute;
-    public GameObject voxelPrefab;
+    private GameObject voxelPrefab; //USE FOR DEBUG
 
     [Header("Voxellization Parameters")]
     [Range(1.0f, 100.0f)]
@@ -13,10 +13,11 @@ public class ProcessMesh : MonoBehaviour
 
     private VoxelUnit[,,] map;
     private Triangle[] triangles;
+
+    //Map size
     private int xSize;
     private int ySize;
     private int zSize;
-    private Vector3 boundsTransformer;
 
     void Start()
     {
@@ -159,10 +160,9 @@ public class ProcessMesh : MonoBehaviour
 
     }
 
+    ///USE FOR DEBUG ONLY : Generate VoxelMesh according to map content
     private void GenerateVoxel()
     {
-        ///Generate VoxelMesh according to map content
-
         for (int x = 0; x < xSize; ++x)
         {
             for (int y = 0; y < ySize; ++y)
@@ -178,7 +178,7 @@ public class ProcessMesh : MonoBehaviour
         }
     }
 
-    ///Add vertice info to map
+    ///(Deprecated) Add vertice info to map
     private void AddVertToMap(Vector3 vert)
     {
         Coord c = VertToCoord(vert);
@@ -242,7 +242,7 @@ public class ProcessMesh : MonoBehaviour
         return line;
     }
 
-    //It's fucking wizardry : https://www.developpez.net/forums/d3690/general-developpement/algorithme-mathematiques/general-algorithmique/point-l-interieur-d-triangle/
+    //Method explained : https://www.developpez.net/forums/d3690/general-developpement/algorithme-mathematiques/general-algorithmique/point-l-interieur-d-triangle/
     private bool IsInsideTriangle(Coord m, Triangle tri)
     {
         int check = 0;
@@ -265,6 +265,7 @@ public class ProcessMesh : MonoBehaviour
             return false;
     }
 
+    ///Fill anormal holes in map
     private void FillMap()
     {
         List<Coord> coordsToPrint = new List<Coord>();
@@ -277,7 +278,7 @@ public class ProcessMesh : MonoBehaviour
                     if (map[x,y,z].empty)
                     {
                         Coord c = new Coord(x, y, z);
-                        if (GetBoundaries(c) >= 5)
+                        if (GetSurroundings(c) >= 5)
                         {
                             coordsToPrint.Add(c);
                         }
@@ -291,10 +292,9 @@ public class ProcessMesh : MonoBehaviour
         }
     }
 
-    private int GetBoundaries(Coord c)
+    private int GetSurroundings(Coord c)
     {
         int result = 0;
-        int debug = 0;
         for (int x = c.x - 1; x <= c.x + 1; ++x)
         {
             for (int y = c.y - 1; y <= c.y + 1; ++y)
@@ -311,7 +311,6 @@ public class ProcessMesh : MonoBehaviour
                 }
             }
         }
-        // Debug.Log(debug);
         return result;
     }
 
