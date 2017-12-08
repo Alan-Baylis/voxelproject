@@ -9,7 +9,8 @@ Shader "Unlit/Voxelise"
 		_MainTex ("Texture", 2D) = "white" {}
 
 		//Size of the cubes
-		_DefinitionSize("Definition", float) = 1
+		_Granularity("Definition", float) = 1
+
 
 	}
 	SubShader
@@ -61,7 +62,7 @@ Shader "Unlit/Voxelise"
 
 			sampler2D _MainTex;
 			float4 _MainTex_ST;
-
+			float _Granularity;
 
 			
 			v2f vert (appdata v)
@@ -69,41 +70,19 @@ Shader "Unlit/Voxelise"
 				v2f o;
 				 //convert to camera space
 
-				float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
-				o.wpos = worldPos;
-				o.vpos = v.vertex.xyz;
-				
-				//displace the position of the vertices
-				o.wpos.x = round(o.wpos.x);
-				o.wpos.y = round(o.wpos.y);
+				// voxelisation
+				float lod = 16 - _Granularity;
+				//float lod = 1. + length(v.vertex.xyz) * 0.1;
+				float3 grid = ceil(v.vertex.xyz * lod) / lod;
+				v.vertex.xyz = grid;
+				v.vertex.xyz = lerp(v.vertex.xyz, grid, clamp(_Granularity,0,1));
 
-				o.pos = UnityObjectToClipPos(o.wpos);
+				o.pos = UnityObjectToClipPos(v.vertex);
 
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 
-
-				//////////////////////////////////////////////////////////
-				if(allMyVertex[0].x == 0 && allMyVertex[0].w == 0){
-					allMyVertex[0] = o.pos;
-				}else{
-					allMyVertex2 = allMyVertex;
-					arraySize ++;
-					allMyVertex[arraySize];
-
-					for(int i = 0; i < arraySize; i++){
-
-						if(arraySize-1 == i){
-							allMyVertex[i] = o.pos;
-						}else{
-							allMyVertex[i] = allMyVertex2[i];
-						}
-
-					}
-
-				}
-
-				//////////////////////////////////////////////////////////
-
+				
+				//Lighting
 				float3 worldNormal = UnityObjectToWorldNormal(v.normal);
 
                 float nl = max(0, dot(worldNormal, _WorldSpaceLightPos0.xyz));
@@ -136,3 +115,27 @@ Shader "Unlit/Voxelise"
 
 	}
 }
+
+
+/*
+				//////////////////////////////////////////////////////////
+				if(allMyVertex[0].x == 0 && allMyVertex[0].w == 0){
+					allMyVertex[0] = o.pos;
+				}else{
+					allMyVertex2 = allMyVertex;
+					arraySize ++;
+					allMyVertex[arraySize];
+
+					for(int i = 0; i < arraySize; i++){
+
+						if(arraySize-1 == i){
+							allMyVertex[i] = o.pos;
+						}else{
+							allMyVertex[i] = allMyVertex2[i];
+						}
+
+					}
+
+				}
+*/
+				//////////////////////////////////////////////////////////

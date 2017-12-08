@@ -23,21 +23,15 @@ public class ProcessMesh : MonoBehaviour
         Process();
     }
 
-    ///Fonction "main" qui va appeller toutes les autres fonctions
+    ///Main function which will call every other functions
     public void Process()
     {
         SetupMap();
         SetupTriangles();
-        /* 
-        foreach (Vector3 vert in meshToCompute.vertices)
-        {
-            AddVertToMap(vert);
-        }
-        */
         ConnectPoints();
         FillTriangles();
         FillMap();
-        // GenerateVoxel();
+        // GenerateVoxel(); // use for debug
         GetComponent<GenerateVoxelMesh>().GenerateMesh(map, new Coord(xSize, ySize, zSize));
     }
 
@@ -69,9 +63,9 @@ public class ProcessMesh : MonoBehaviour
         List<Triangle> tris = new List<Triangle>();
         for (int i = 2; i < meshToCompute.triangles.Length; i += 3)
         {
-            Coord a = WorldToCoord(meshToCompute.vertices[meshToCompute.triangles[i - 2]]);
-            Coord b = WorldToCoord(meshToCompute.vertices[meshToCompute.triangles[i - 1]]);
-            Coord c = WorldToCoord(meshToCompute.vertices[meshToCompute.triangles[i]]);
+            Coord a = VertToCoord(meshToCompute.vertices[meshToCompute.triangles[i - 2]]);
+            Coord b = VertToCoord(meshToCompute.vertices[meshToCompute.triangles[i - 1]]);
+            Coord c = VertToCoord(meshToCompute.vertices[meshToCompute.triangles[i]]);
             Triangle tri = new Triangle(a, b, c);
             tris.Add(tri);
         }
@@ -187,18 +181,18 @@ public class ProcessMesh : MonoBehaviour
     ///Add vertice info to map
     private void AddVertToMap(Vector3 vert)
     {
-        Coord c = WorldToCoord(vert);
+        Coord c = VertToCoord(vert);
         map[c.x, c.y, c.z].AddColor(Color.white);
     }
 
     //Transform a point on the mesh into a map coordinate, according to mesh position and voxel resolution
-    private Coord WorldToCoord(Vector3 worldPos)
+    private Coord VertToCoord(Vector3 vertPos)
     {
-        worldPos += meshToCompute.bounds.extents;
+        vertPos += meshToCompute.bounds.extents;
         int x, y, z;
-        x = Mathf.FloorToInt(worldPos.x * definition);
-        y = Mathf.FloorToInt(worldPos.y * definition);
-        z = Mathf.FloorToInt(worldPos.z * definition);
+        x = Mathf.FloorToInt(vertPos.x * definition);
+        y = Mathf.FloorToInt(vertPos.y * definition);
+        z = Mathf.FloorToInt(vertPos.z * definition);
         return ClampIntoBounds(new Coord(x, y, z));
     }
 
