@@ -27,7 +27,7 @@ Shader "Unlit/Voxelise"
 			#include "UnityCG.cginc"
 			#include "Lighting.cginc"
 
-			 #pragma multi_compile_fwdbase nolightmap nodirlightmap nodynlightmap novertexlight
+			#pragma multi_compile_fwdbase nolightmap nodirlightmap nodynlightmap novertexlight
             #include "AutoLight.cginc"
 
 
@@ -52,8 +52,8 @@ Shader "Unlit/Voxelise"
 				 SHADOW_COORDS(1)
 				float4 pos : SV_POSITION;
 
-				float3 wpos : TEXCOORD1;
-				float3 vpos : TEXCOORD2;
+				float3 wpos : TEXCOORD2;
+				float3 vpos : TEXCOORD3;
 				
 				float3 diff : COLOR0;
 				fixed3 ambient : COLOR1;
@@ -63,23 +63,21 @@ Shader "Unlit/Voxelise"
 			float4 _MainTex_ST;
 
 
-
 			
 			v2f vert (appdata v)
 			{
 				v2f o;
-				o.pos = UnityObjectToClipPos(v.vertex); //convert to camera space
+				 //convert to camera space
 
 				float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
 				o.wpos = worldPos;
 				o.vpos = v.vertex.xyz;
 				
-				//displace the position of the vertices in the camera space
+				//displace the position of the vertices
 				o.wpos.x = round(o.wpos.x);
 				o.wpos.y = round(o.wpos.y);
 
-				o.pos.xy = float2(o.wpos.x, -o.wpos.y);
-
+				o.pos = UnityObjectToClipPos(o.wpos);
 
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 
@@ -129,9 +127,6 @@ Shader "Unlit/Voxelise"
                 col.rgb *= lighting;
 				return col; 
 			}
-
-
-
 
 			
 			ENDCG
