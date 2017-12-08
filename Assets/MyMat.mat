@@ -7,7 +7,7 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: MyMat
-  m_Shader: {fileID: 4800000, guid: 1b62e4e390bceff4b822240ec1f740f6, type: 3}
+  m_Shader: {fileID: 4800000, guid: 119fa4af309f1ee4f9cae62c71b7c4a8, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -39,7 +39,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 10906, guid: 0000000000000000f000000000000000, type: 0}
+        m_Texture: {fileID: 10305, guid: 0000000000000000f000000000000000, type: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -63,7 +63,7 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _Granularity: 4.19
+    - _Granularity: 233.7
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
