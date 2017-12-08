@@ -45,7 +45,7 @@
 			struct v2f
 			{
 				float2 uv : TEXCOORD0;
-				 SHADOW_COORDS(1)
+				 SHADOW_COORDS(1) //TEXCOORD1
 				float4 pos : SV_POSITION;
 				float3 diff : COLOR0;
 				fixed3 ambient : COLOR1;
@@ -70,28 +70,29 @@
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 
 
+				////////////////////////////////////////////////////////// take all vertex in an array to check the distance between them and know hom many are near (cube or something unwanted)
+				//if(allMyVertex[0].x == 0 && allMyVertex[0].w == 0){
+				//	allMyVertex[0] = o.pos;
+				//}else{
+				//	allMyVertex2 = allMyVertex;
+				//	arraySize ++;
+				//	allMyVertex[arraySize];
+
+				//	for(int i = 0; i < arraySize; i++){
+
+				//		if(arraySize-1 == i){
+				//			allMyVertex[i] = o.pos;
+				//		}else{
+				//			allMyVertex[i] = allMyVertex2[i];
+				//		}
+
+				//	}
+
+				//}
+
 				//////////////////////////////////////////////////////////
-				if(allMyVertex[0].x == 0 && allMyVertex[0].w == 0){
-					allMyVertex[0] = o.pos;
-				}else{
-					allMyVertex2 = allMyVertex;
-					arraySize ++;
-					allMyVertex[arraySize];
 
-					for(int i = 0; i < arraySize; i++){
-
-						if(arraySize-1 == i){
-							allMyVertex[i] = o.pos;
-						}else{
-							allMyVertex[i] = allMyVertex2[i];
-						}
-
-					}
-
-				}
-
-				//////////////////////////////////////////////////////////
-
+				//light and shadows
 				float3 worldNormal = UnityObjectToWorldNormal(v.normal);
 
                 float nl = max(0, dot(worldNormal, _WorldSpaceLightPos0.xyz));
@@ -110,6 +111,7 @@
 				fixed4 col = tex2D(_MainTex, i.uv); //color of the texture
 				//col = float4(0.8,0.3,0.3,1); //redColor
 
+				//light and shadows change the color
                 fixed shadow = SHADOW_ATTENUATION(i);
                 fixed3 lighting = i.diff * shadow + i.ambient;
                 col.rgb *= lighting;
