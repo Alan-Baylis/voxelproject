@@ -1,4 +1,6 @@
-﻿Shader "Unlit/Voxelise"
+﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+
+Shader "Unlit/Voxelise"
 {
 	Properties
 	{
@@ -44,9 +46,15 @@
 
 			struct v2f
 			{
+				
+
 				float2 uv : TEXCOORD0;
 				 SHADOW_COORDS(1)
 				float4 pos : SV_POSITION;
+
+				float3 wpos : TEXCOORD1;
+				float3 vpos : TEXCOORD2;
+				
 				float3 diff : COLOR0;
 				fixed3 ambient : COLOR1;
 			};
@@ -61,10 +69,16 @@
 			{
 				v2f o;
 				o.pos = UnityObjectToClipPos(v.vertex); //convert to camera space
+
+				float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
+				o.wpos = worldPos;
+				o.vpos = v.vertex.xyz;
 				
 				//displace the position of the vertices in the camera space
-				o.pos.x = round(o.pos.x);
-				o.pos.y = round(o.pos.y);
+				o.wpos.x = round(o.wpos.x);
+				o.wpos.y = round(o.wpos.y);
+
+				o.pos.xy = float2(o.wpos.x, -o.wpos.y);
 
 
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
